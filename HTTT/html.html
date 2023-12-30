@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif; /* Specify the chosen font family */
+            overflow: hidden;
+        }
+
+        #frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 5px;
+            background-color: #333333;
+            width: 80%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+
+        #content {
+            white-space: pre-wrap;
+            outline: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #saveBtn,
+        #postBtn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #postLink {
+            margin-top: 10px;
+            color: #3498db;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+    </style>
+    <title>Notepad-like Website</title>
+</head>
+<body>
+    <div id="frame">
+        <div id="content" contenteditable="true">
+            Hello, this is your notepad content. You can write anything here.
+        </div>
+        <button id="saveBtn" onclick="saveContent()">Save</button>
+        <button id="postBtn" onclick="postContent()">Post</button>
+        <div id="postLink"></div>
+    </div>
+
+    <script>
+        function saveContent() {
+            var content = document.getElementById('content').innerText;
+            var blob = new Blob([content], { type: 'text/plain' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'notepad_content.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function postContent() {
+            var content = document.getElementById('content').innerHTML;
+
+            // Prompt user for a filename
+            var postFileName = prompt('Enter a filename for your post:');
+            if (!postFileName) {
+                return; // User canceled or entered an empty filename
+            }
+
+            // Ensure the filename ends with ".html"
+            if (!postFileName.endsWith('.html')) {
+                postFileName += '.html';
+            }
+
+            // Create a Blob with the content
+            var blob = new Blob([content], { type: 'text/html' });
+
+            // Create a link element
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+
+            // Create a folder named "POSTS" if it doesn't exist
+            var folderName = 'POSTS';
+            var folderPath = folderName + '/';
+            if (!window.location.href.includes(folderPath)) {
+                var folderLink = document.createElement('a');
+                folderLink.href = folderPath;
+                folderLink.target = '_blank';
+                document.body.appendChild(folderLink);
+                folderLink.click();
+                document.body.removeChild(folderLink);
+            }
+
+            // Save the file in the "POSTS" folder
+            a.download = folderPath + postFileName;
+
+            // Append the link to the document body and click it
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Display the link in a popup
+            alert('Location of the file: ' + window.location.href + folderPath + postFileName);
+
+            // Save post details as a text file
+            savePostDetails(postFileName, folderPath);
+        }
+
+        function savePostDetails(fileName, folderPath) {
+            var postDetails = 'Location of the file: ' + window.location.href + folderPath + fileName;
+
+            var blob = new Blob([postDetails], { type: 'text/plain' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'post_details.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
